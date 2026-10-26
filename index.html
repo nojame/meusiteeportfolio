@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaime Júlio Sinifa | Portfólio</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<style>
+    /* Cartões totalmente clicáveis */
+    .card, .timeline > div, .projeto {
+        cursor: pointer;
+        transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .card:hover, .timeline > div:hover, .projeto:hover {
+        transform: translateY(-5px);
+    }
+
+    .card::after, .timeline > div::after, .projeto::after {
+        content: "Clique para abrir";
+        display: block;
+        margin-top: 12px;
+        font-size: 13px;
+        opacity: .7;
+    }
+
+    /* Janela interna estilo aplicativo */
+    .app-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(0,0,0,.72);
+        backdrop-filter: blur(5px);
+    }
+
+    .app-modal.active {
+        display: flex;
+        animation: aparecer .2s ease;
+    }
+
+    .app-window {
+        width: min(1000px, 96vw);
+        max-height: 92vh;
+        overflow-y: auto;
+        background: linear-gradient(145deg, #ffffff 0%, #f7faff 100%);
+        border-radius: 22px;
+        box-shadow: 0 25px 70px rgba(0,0,0,.35);
+        animation: abrirApp .3s ease;
+    }
+
+    .app-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #0f172a, #0369a1, #059669);
+        color: #fff;
+    }
+
+    .app-topbar h2 {
+        margin: 0;
+        font-size: 20px;
+    }
+
+    .fechar-app {
+        border: 0;
+        background: #ef4444;
+        color: white;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    .app-content {
+        padding: 40px;
+        color: #1f2937;
+        font-size: 16px;
+        line-height: 1.8;
+    }
+
+    .app-icon {
+        font-size: 52px;
+        margin-bottom: 18px;
+        background: linear-gradient(135deg, #0284c7, #059669);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .app-content h3 {
+        margin-top: 0;
+    }
+
+    .app-content .info-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .app-content .info-item:last-child {
+        border-bottom: 0;
+    }
+
+    .app-content h3 {
+        font-size: 26px;
+        margin: 10px 0 18px;
+    }
+
+    .app-content p {
+        margin: 0 0 18px;
+    }
+
+    .app-content strong {
+        color: #5b21b6;
+    }
+
+    .app-content .info-item {
+        padding: 16px 18px;
+        margin: 12px 0;
+        border: 1px solid #e0e7ff;
+        border-radius: 14px;
+        background: rgba(255,255,255,.8);
+    }
+
+    @media (max-width: 600px) {
+        .app-window { width: 96vw; max-height: 94vh; }
+        .app-content { padding: 24px; }
+        .app-topbar { padding: 14px 16px; }
+    }
+
+
+    .contacto-principal {
+        margin: 12px 0 20px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .contacto-principal a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .contacto-principal a:hover {
+        text-decoration: underline;
+    }
+
+    .sobre-dentro-conheca {
+        width: min(1100px, 94%);
+        margin: 0 auto 25px;
+        padding: 30px 35px;
+        border-radius: 28px;
+        background: #fff;
+        color: #1f2937;
+        box-shadow: 0 20px 60px rgba(0,0,0,.12);
+    }
+
+    .sobre-dentro-conheca h2 {
+        margin-top: 0;
+        color: #312e81;
+    }
+
+    .sobre-dentro-conheca p {
+        line-height: 1.8;
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 600px) {
+        .sobre-dentro-conheca {
+            padding: 24px;
+        }
+    }
+
+    body.modal-aberto {
+        overflow: hidden;
+    }
+
+    @keyframes abrirApp {
+        from { transform: scale(.92) translateY(20px); opacity: 0; }
+        to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    @keyframes aparecer {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+
+<style>
+    /* Tudo fica concentrado dentro do botão Conheça-me */
+    #conhecaMeArea {
+        display: none;
+        padding: 35px 20px 60px;
+    }
+
+    #conhecaMeArea.aberto {
+        display: block;
+        animation: entrar .45s ease;
+    }
+
+    .conheca-menu {
+        width: min(1100px, 94%);
+        margin: 0 auto;
+        padding: 35px;
+        border-radius: 28px;
+        background: linear-gradient(135deg, #111827, #312e81, #0891b2);
+        color: #fff;
+        box-shadow: 0 25px 70px rgba(0,0,0,.25);
+    }
+
+    .menu-intro {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        margin-bottom: 30px;
+    }
+
+    .menu-intro > i {
+        font-size: 55px;
+    }
+
+    .menu-intro h2 {
+        margin: 0 0 6px;
+        font-size: 30px;
+    }
+
+    .menu-intro p {
+        margin: 0;
+        opacity: .9;
+    }
+
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+    .menu-item {
+        border: 1px solid rgba(255,255,255,.2);
+        border-radius: 20px;
+        padding: 25px;
+        text-align: left;
+        cursor: pointer;
+        color: #fff;
+        background: rgba(255,255,255,.12);
+        backdrop-filter: blur(8px);
+        transition: .25s ease;
+    }
+
+    .menu-item:hover {
+        transform: translateY(-6px);
+        background: rgba(255,255,255,.2);
+        box-shadow: 0 15px 35px rgba(0,0,0,.2);
+    }
+
+    .menu-item i {
+        font-size: 32px;
+        margin-bottom: 14px;
+        display: block;
+    }
+
+    .menu-item span {
+        display: block;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .menu-item small {
+        display: block;
+        margin-top: 6px;
+        opacity: .85;
+    }
+
+    .area-interna {
+        display: none;
+        width: min(1100px, 94%);
+        margin: 25px auto;
+        padding: 35px;
+        border-radius: 28px;
+        background: #fff;
+        box-shadow: 0 20px 60px rgba(0,0,0,.12);
+        animation: entrar .35s ease;
+    }
+
+    .area-interna.visivel {
+        display: block;
+    }
+
+    .voltar-menu {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 25px;
+        padding: 10px 18px;
+        border: 0;
+        border-radius: 12px;
+        cursor: pointer;
+        color: #fff;
+        background: linear-gradient(135deg, #312e81, #0891b2);
+        font-weight: 600;
+    }
+
+    @keyframes entrar {
+        from { opacity: 0; transform: translateY(18px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 700px) {
+        .menu-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .conheca-menu,
+        .area-interna {
+            padding: 22px;
+        }
+
+        .menu-intro {
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<style>
+    /* ===== CORES CHAMATIVAS - por dentro do Conheça-me ===== */
+
+    .sobre-dentro-conheca {
+        background: linear-gradient(135deg, #fff7ed 0%, #ffe4f1 50%, #eef2ff 100%);
+        border: 2px solid transparent;
+        background-image:
+            linear-gradient(135deg, #fff7ed 0%, #ffe4f1 50%, #eef2ff 100%),
+            linear-gradient(135deg, #0284c7, #0891b2, #059669);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+    }
+
+    .sobre-dentro-conheca h2 {
+        background: linear-gradient(135deg, #0284c7, #0891b2, #059669);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .conheca-menu {
+        background: linear-gradient(135deg, #0f172a, #0369a1, #0891b2, #059669);
+        background-size: 250% 250%;
+        animation: gradienteMover 10s ease infinite;
+    }
+
+    @keyframes gradienteMover {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .menu-item:nth-child(1) i { color: #38bdf8; }
+    .menu-item:nth-child(2) i { color: #34d399; }
+    .menu-item:nth-child(3) i { color: #7dd3fc; }
+    .menu-item:nth-child(4) i { color: #6ee7b7; }
+
+    .menu-item:hover {
+        background: rgba(255,255,255,.3);
+    }
+
+    #competencias, #experiencia, #projetos, #contactos {
+        background: linear-gradient(180deg, #fdf4ff 0%, #eff6ff 100%);
+        border-radius: 28px;
+        padding: 35px;
+        width: min(1100px, 94%);
+        margin: 25px auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,.12);
+    }
+
+    #competencias.area-interna,
+    #experiencia.area-interna,
+    #projetos.area-interna,
+    #contactos.area-interna {
+        display: none;
+    }
+
+    #competencias.area-interna.visivel,
+    #experiencia.area-interna.visivel,
+    #projetos.area-interna.visivel,
+    #contactos.area-interna.visivel {
+        display: block;
+    }
+
+    .card, .projeto {
+        border-top: 5px solid;
+        border-image: linear-gradient(135deg, #0284c7, #0891b2, #059669) 1;
+        background: #fff;
+        border-radius: 16px;
+    }
+
+    .card i {
+        background: linear-gradient(135deg, #0284c7, #0891b2, #059669);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .timeline > div {
+        border-left: 5px solid #0891b2;
+        background: #fff;
+        border-radius: 16px;
+        padding-left: 18px;
+    }
+
+    .voltar-menu {
+        background: linear-gradient(135deg, #0284c7, #0891b2, #059669);
+    }
+
+    /* ===== Botões WhatsApp e Facebook ===== */
+    .redes-sociais {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 18px;
+    }
+
+    .botao-rede {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 22px;
+        border-radius: 14px;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,.15);
+        transition: transform .2s ease;
+    }
+
+    .botao-rede:hover {
+        transform: translateY(-4px);
+    }
+
+    .botao-rede i {
+        font-size: 24px;
+    }
+
+    .botao-whatsapp {
+        background: linear-gradient(135deg, #25d366, #128c7e);
+    }
+
+    /* Botão flutuante do WhatsApp - visível assim que se entra no Conheça-me */
+    .whatsapp-flutuante {
+        display: none;
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        z-index: 500;
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #25d366, #128c7e);
+        color: #fff;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        box-shadow: 0 12px 30px rgba(0,0,0,.3);
+        text-decoration: none;
+        animation: pulsarWhats 2.2s ease-in-out infinite;
+    }
+
+    #conhecaMeArea.aberto .whatsapp-flutuante {
+        display: flex;
+    }
+
+    @keyframes pulsarWhats {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+    }
+
+    @media (max-width: 600px) {
+        .whatsapp-flutuante {
+            width: 54px;
+            height: 54px;
+            font-size: 26px;
+            right: 16px;
+            bottom: 16px;
+        }
+    }
+
+    .botao-facebook {
+        background: linear-gradient(135deg, #1877f2, #0a58ca);
+    }
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="container">
+
+<img class="foto" src="foto.png" alt="foto">
+
+<h1>Jaime Júlio Sinifa</h1>
+
+<p>Técnico de Suporte Informático</p>
+
+<p class="contacto-principal">
+    <i class="fas fa-phone"></i>
+    <a href="tel:+258848021596">84 802 1596</a> / <a href="tel:+258870676553">87 067 6553</a>
+</p>
+
+<a href="#sobre" class="botao" id="conhecaMeBtn">Conheça-me</a>
+
+</div>
+
+</header>
+
+<!-- Todo o conteúdo do portfólio fica dentro de "Conheça-me" -->
+<div id="conhecaMeArea" class="conheca-area">
+
+    <a class="whatsapp-flutuante" href="https://wa.me/258848021596" target="_blank" aria-label="Falar no WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <div id="conhecaMeInicio">
+
+    <section id="sobre" class="sobre-dentro-conheca">
+        <h2>Quem eu sou</h2>
+        <p>
+            Sou Técnico de Suporte Informático. Possuo experiência em atendimento ao público, e suporte técnico.
+            Procuro oferecer soluções eficientes, rápidas e de qualidade, sou formado pelo IMPG de Gorongosa.
+        </p>
+    </section>
+
+    <div class="conheca-menu">
+        <div class="menu-intro">
+            <i class="fas fa-user-circle"></i>
+            <div>
+                <h2>Conheça o meu trabalho</h2>
+                <p>Explore o meu perfil, competências, experiências, projectos e contactos.</p>
+            </div>
+        </div>
+
+        <div class="menu-grid">
+            <button class="menu-item" data-target="competencias">
+                <i class="fas fa-laptop-code"></i>
+                <span>Competências</span>
+                <small>Ver as minhas capacidades</small>
+            </button>
+
+            <button class="menu-item" data-target="projetos">
+                <i class="fas fa-folder-open"></i>
+                <span>Projectos</span>
+                <small>Explorar os meus projectos</small>
+            </button>
+
+            <button class="menu-item" data-target="contactos">
+                <i class="fas fa-address-book"></i>
+                <span>Contactos</span>
+                <small>Entrar em contacto comigo</small>
+            </button>
+        </div>
+    </div>
+
+    </div>
+
+    <section id="competencias" class="area-interna">
+    <button class="voltar-menu"><i class="fas fa-arrow-left"></i> Voltar ao Conheça-me</button>
+    <p>Clique numa competência para ver mais informações.</p>
+
+<div class="skills">
+
+<div class="card" data-type="competencia" data-title="Manutenção" data-icon="fas fa-desktop" data-info="<p><strong>Área:</strong> Manutenção de computadores.</p><p><strong>Actividades:</strong> Reparação, limpeza, formatação, diagnóstico e optimização de computadores.</p><p><strong>Objectivo:</strong> Garantir o bom funcionamento e prolongar a vida útil dos equipamentos.</p>">
+<i class="fas fa-desktop"></i>
+<h3>Manutenção</h3>
+<p>Reparação e manutenção de computadores.</p>
+</div>
+
+<div class="card" data-type="competencia" data-title="Redes" data-icon="fas fa-wifi" data-info="<p><strong>Área:</strong> Redes informáticas.</p><p><strong>Actividades:</strong> Configuração de redes locais, ligação de equipamentos e resolução de problemas de conectividade.</p>">
+<i class="fas fa-wifi"></i>
+<h3>Redes</h3>
+<p>Configuração de redes locais.</p>
+</div>
+
+<div class="card" data-type="competencia" data-title="Windows" data-icon="fab fa-windows" data-info="<p><strong>Área:</strong> Sistemas operativos.</p><p><strong>Actividades:</strong> Instalação, configuração, actualização e manutenção de sistemas Windows.</p>">
+<i class="fab fa-windows"></i>
+<h3>Windows</h3>
+<p>Instalação e configuração.</p>
+</div>
+
+<div class="card" data-type="competencia" data-title="Microsoft Office" data-icon="fas fa-file-word" data-info="<p><strong>Ferramentas:</strong> Microsoft Word, Excel e PowerPoint.</p><p><strong>Actividades:</strong> Criação e edição de documentos, folhas de cálculo e apresentações.</p>">
+<i class="fas fa-file-word"></i>
+<h3>Microsoft Office</h3>
+<p>Word, Excel e PowerPoint.</p>
+</div>
+
+    </div>
+
+    </section>
+
+    <section id="experiencia" class="area-interna">
+    <button class="voltar-menu"><i class="fas fa-arrow-left"></i> Voltar ao Conheça-me</button>
+    <p>Clique numa experiência para ver mais informações.</p>
+
+<div class="timeline">
+
+<div data-type="experiencia" data-title="Pietros Serviços" data-icon="fas fa-briefcase" data-info="<p><strong>Ano:</strong> 2020.</p><p><strong>Empresa:</strong> Pietros Serviços.</p><p><strong>Experiência:</strong> Atendimento ao público, apoio aos clientes, vendas e actividades relacionadas com suporte.</p>">
+<h3>Pietros Serviços</h3>
+<p>2020</p>
+</div>
+
+<div data-type="experiencia" data-title="Solution Center" data-icon="fas fa-briefcase" data-info="<p><strong>Ano:</strong> 2017.</p><p><strong>Empresa:</strong> Solution Center.</p><p><strong>Experiência:</strong> Atendimento, apoio técnico e prestação de serviços.</p>">
+<h3>Solution Center</h3>
+<p>2017</p>
+</div>
+
+<div data-type="experiencia" data-title="Movitel" data-icon="fas fa-briefcase" data-info="<p><strong>Ano:</strong> 2014.</p><p><strong>Empresa:</strong> Movitel.</p><p><strong>Experiência:</strong> Atendimento ao cliente, vendas e contacto com serviços de telecomunicações.</p>">
+<h3>Movitel</h3>
+<p>2014</p>
+</div>
+
+    </div>
+
+    </section>
+
+    <section id="projetos" class="area-interna">
+    <button class="voltar-menu"><i class="fas fa-arrow-left"></i> Voltar ao Conheça-me</button>
+    <p>Clique num projecto para ver mais informações.</p>
+
+<div class="projetos">
+
+<div class="projeto" data-type="projecto" data-title="Manutenção de Computadores" data-icon="fas fa-tools" data-info="<p><strong>Descrição:</strong> Projecto dedicado à manutenção preventiva e correctiva de computadores.</p><p><strong>Actividades:</strong> Formatação, limpeza, diagnóstico, reparação e optimização.</p><p><strong>Resultado:</strong> Equipamentos mais rápidos, estáveis e preparados para o uso diário.</p>">
+
+<img src="manutencao.jpeg" alt="Manutenção de Computadores">
+
+<h3>Manutenção de Computadores</h3>
+
+<p>Formatação, limpeza e otimização de computadores.</p>
+
+</div>
+
+<div class="projeto" data-type="projecto" data-title="Instalação de Sistemas Operativos" data-icon="fas fa-laptop-code" data-info="<p><strong>Descrição:</strong> Instalação e configuração de sistemas operativos.</p><p><strong>Sistemas:</strong> Windows 7, 8, 8.1, 10, 11, Linux e Ubuntu.</p><p><strong>Inclui:</strong> Instalação de drivers, actualizações e programas essenciais.</p>">
+
+<img src="windows.jpg" alt="Instalação de Sistemas Operativos">
+
+<h3>Instalação de Sistemas Operativos</h3>
+
+<p>Windows 7, 8, 8.1, 10, 11, Linux, Ubuntu e programas essenciais.</p>
+
+</div>
+
+<div class="projeto" data-type="projecto" data-title="Redes" data-icon="fas fa-network-wired" data-info="<p><strong>Descrição:</strong> Configuração de redes e impressoras.</p><p><strong>Actividades:</strong> Ligação de equipamentos, configuração de rede local, partilha e configuração de impressoras.</p><p><strong>Objectivo:</strong> Facilitar a comunicação e partilha de recursos entre equipamentos.</p>">
+
+<img src="rede.jpg" alt="Redes">
+
+<h3>Redes</h3>
+
+<p>Configuração de redes e impressoras.</p>
+
+</div>
+
+<div class="projeto" data-type="projecto" data-title="Criação de Canal no YouTube" data-icon="fab fa-youtube" data-info="<p><strong>Descrição:</strong> Criação e organização de um canal no YouTube para partilhar conteúdos, demonstrações e tutoriais de informática.</p><p><strong>Actividades:</strong> Definição do tema do canal, criação da identidade visual, preparação de vídeos, elaboração de títulos e descrições e publicação de conteúdos.</p><p><strong>Objectivo:</strong> Partilhar conhecimentos de informática e ajudar outras pessoas a aprender através de conteúdos digitais.</p>">
+
+<img src="logoyoutube.png" alt="">
+    <h3><i class="logoyoutube"></i> Criação de Canal no YouTube</h3>
+
+<p>Organização e partilha de tutoriais e conteúdos de informática.</p>
+
+</div>
+
+<div class="projeto" data-type="projecto" data-title="Criação de Portefólio Digital" data-icon="fas fa-globe" data-info="<p><strong>Descrição:</strong> Desenvolvimento de um portefólio digital para apresentar o perfil, as competências, a experiência, os projectos e os contactos profissionais.</p><p><strong>Tecnologias:</strong> HTML, CSS e JavaScript.</p><p><strong>Actividades:</strong> Estruturação das páginas, criação do design responsivo, organização dos projectos e inclusão de ligações para contactos e redes sociais.</p><p><strong>Objectivo:</strong> Divulgar competências e trabalhos realizados e construir uma presença profissional na Internet.</p>">
+
+<img src="shop.jpg" alt="shop">
+    <h3><i class="fas fa-globe"></i> Criação de Portefólio Digital</h3>
+
+<p>Apresentação de competências, projectos e contactos numa página web.</p>
+
+</div>
+
+    </div>
+
+    </section>
+
+    <section id="contactos" class="area-interna">
+    <button class="voltar-menu"><i class="fas fa-arrow-left"></i> Voltar ao Conheça-me</button>
+
+    <p>Entra em contacto comigo através dos meus canais:</p>
+
+    <div class="redes-sociais">
+        <a class="botao-rede botao-whatsapp" href="tel:+258848021596">
+            <i class="fas fa-phone"></i> 84 802 1596
+        </a>
+
+        <a class="botao-rede botao-whatsapp" href="tel:+258870676553">
+            <i class="fas fa-phone"></i> 87 067 6553
+        </a>
+
+        <a class="botao-rede botao-facebook" href="https://www.facebook.com/JaimeSinifa" target="_blank">
+            <i class="fab fa-facebook"></i> Facebook
+        </a>
+    </div>
+
+    </section>
+
+</div>
+
+<!-- Janela interna estilo aplicativo -->
+<div class="app-modal" id="appModal" aria-hidden="true">
+    <div class="app-window" role="dialog" aria-modal="true" aria-labelledby="appTitle">
+        <div class="app-topbar">
+            <h2 id="appTitle">Informações</h2>
+            <button class="fechar-app" id="fecharApp" aria-label="Fechar">×</button>
+        </div>
+        <div class="app-content">
+            <div class="app-icon"><i id="appIcon" class="fas fa-info-circle"></i></div>
+            <div id="appInfo"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const modal = document.getElementById('appModal');
+const appTitle = document.getElementById('appTitle');
+const appIcon = document.getElementById('appIcon');
+const appInfo = document.getElementById('appInfo');
+const fecharApp = document.getElementById('fecharApp');
+
+document.querySelectorAll('.card[data-title], .timeline > div[data-title], .projeto[data-title]').forEach(item => {
+    item.addEventListener('click', function(event) {
+        // Evita abrir duas vezes quando o utilizador clicar num link/imagem.
+        if (event.target.closest('a')) return;
+
+        appTitle.textContent = this.dataset.title;
+        appIcon.className = this.dataset.icon || 'fas fa-info-circle';
+        appInfo.innerHTML = this.dataset.info || '<p>Não existem informações adicionais.</p>';
+
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-aberto');
+    });
+});
+
+function fecharJanela() {
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-aberto');
+}
+
+fecharApp.addEventListener('click', fecharJanela);
+
+modal.addEventListener('click', function(event) {
+    if (event.target === modal) fecharJanela();
+});
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && modal.classList.contains('active')) {
+        fecharJanela();
+    }
+});
+</script>
+
+
+<script>
+const conhecaBtn = document.getElementById('conhecaMeBtn');
+const conhecaArea = document.getElementById('conhecaMeArea');
+const conhecaInicio = document.getElementById('conhecaMeInicio');
+const botoesMenu = document.querySelectorAll('.menu-item');
+const areas = document.querySelectorAll('.area-interna');
+const botoesVoltar = document.querySelectorAll('.voltar-menu');
+
+conhecaBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    conhecaArea.classList.add('aberto');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+});
+
+botoesMenu.forEach(botao => {
+    botao.addEventListener('click', function() {
+        const destino = document.getElementById(this.dataset.target);
+
+        conhecaInicio.style.display = 'none';
+        areas.forEach(area => area.classList.remove('visivel'));
+
+        destino.classList.add('visivel');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+});
+
+botoesVoltar.forEach(botao => {
+    botao.addEventListener('click', function() {
+        areas.forEach(area => area.classList.remove('visivel'));
+        conhecaInicio.style.display = 'block';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+});
+</script>
+
+</body>
+</html>
